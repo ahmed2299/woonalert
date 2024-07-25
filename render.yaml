@@ -9,16 +9,6 @@ services:
       - key: MONGO_URI
         value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
 
-  - type: cron
-    name: scraper-cron
-    runtime: python
-    schedule: "10 20 * * *"
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python schedule_run.py"
-    envVars:
-      - key: MONGO_URI
-        value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
-
   - type: worker
     name: scraper-worker
     runtime: python
