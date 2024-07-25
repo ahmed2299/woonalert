@@ -13,6 +13,7 @@ from scrapy.crawler import CrawlerProcess
 from requests_html import HTMLSession
 from datetime import datetime
 from lxml import html
+import subprocess
 
 class FundaSpider(scrapy.Spider):
     name = "funda"
@@ -104,10 +105,17 @@ class FundaSpider(scrapy.Spider):
             json.dump(combined_data, file, indent=4)
 
 
+# def scrape_funda():
+#     process = CrawlerProcess()
+#     process.crawl(FundaSpider)
+#     process.start()
+#
+# if __name__ == "__main__":
+#     scrape_funda()
+
+
 def scrape_funda():
-    process = CrawlerProcess()
-    process.crawl(FundaSpider)
-    process.start()
+    subprocess.run(["scrapy", "crawl", "funda"])
 
 if __name__ == "__main__":
     scrape_funda()

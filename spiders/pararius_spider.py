@@ -9,6 +9,7 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from datetime import datetime
 from lxml import html
+import subprocess
 
 class ParariusSpider(scrapy.Spider):
     name = "pararius"
@@ -92,3 +93,10 @@ def scrape_pararius():
 
 if __name__ == "__main__":
     scrape_pararius()
+
+# def scrape_funda():
+#     subprocess.run(["scrapy", "crawl", "pararius"])
+#
+# if __name__ == "__main__":
+#     scrape_funda()
+
