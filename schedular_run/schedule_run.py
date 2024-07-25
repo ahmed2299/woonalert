@@ -1,5 +1,3 @@
-import schedule
-import time
 import subprocess
 import json
 import os
@@ -16,7 +14,9 @@ def run_scrapy_script1():
         logging.info("Starting pararius spider script")
         # Command to run your first Scrapy script
         command1 = 'python spiders/pararius_spider.py'
-        subprocess.run(command1, shell=True)
+        result = subprocess.run(command1, shell=True, capture_output=True, text=True)
+        logging.info(f"pararius spider script output: {result.stdout}")
+        logging.error(f"pararius spider script error: {result.stderr}")
         # After running the script, upload the output JSON to MongoDB
         upload_to_mongo('pararius_data.json', 'pararius_collection')
         logging.info("Finished pararius spider script")
@@ -28,7 +28,9 @@ def run_scrapy_script2():
         logging.info("Starting funda spider script")
         # Command to run your second Scrapy script
         command2 = 'python spiders/funda_spider.py'
-        subprocess.run(command2, shell=True)
+        result = subprocess.run(command2, shell=True, capture_output=True, text=True)
+        logging.info(f"funda spider script output: {result.stdout}")
+        logging.error(f"funda spider script error: {result.stderr}")
         # After running the script, upload the output JSON to MongoDB
         upload_to_mongo('funda_data.json', 'funda_collection')
         logging.info("Finished funda spider script")
@@ -40,6 +42,7 @@ def upload_to_mongo(json_filename, collection_name):
         logging.info(f"Uploading {json_filename} to MongoDB collection {collection_name}")
         # Connect to MongoDB using the environment variable
         mongo_uri = os.getenv('MONGO_URI', 'mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0')
+        logging.info(f"Mongo URI: {mongo_uri}")
         client = MongoClient(mongo_uri)
         db = client['RealEstateDB']
         collection = db[collection_name]
@@ -64,24 +67,15 @@ def upload_to_mongo(json_filename, collection_name):
     except Exception as e:
         logging.error(f"Error uploading to MongoDB: {e}")
 
-# Schedule the scripts to run at the same time
-schedule.every().day.at("19:45").do(run_scrapy_script1)
-schedule.every().day.at("19:45").do(run_scrapy_script2)
-
-def run_scheduler():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
 def run_server():
     handler = SimpleHTTPRequestHandler
     httpd = HTTPServer(('0.0.0.0', 8000), handler)
     httpd.serve_forever()
 
 if __name__ == "__main__":
-    # Start the scheduler in a separate thread
-    scheduler_thread = threading.Thread(target=run_scheduler)
-    scheduler_thread.start()
+    # Run the Scrapy scripts
+    run_scrapy_script1()
+    run_scrapy_script2()
 
     # Start the HTTP server
     run_server()
