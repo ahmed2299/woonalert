@@ -56,8 +56,8 @@ def upload_to_mongo(json_filename, collection_name):
     except Exception as e:
         logging.error(f"Error uploading to MongoDB: {e}")
 
-schedule.every().day.at("01:30").do(run_scrapy_script1)
-schedule.every().day.at("01:30").do(run_scrapy_script2)
+schedule.every().day.at("01:42").do(run_scrapy_script1)
+schedule.every().day.at("01:42").do(run_scrapy_script2)
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
