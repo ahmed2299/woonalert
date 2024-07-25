@@ -64,8 +64,8 @@ def upload_to_mongo(json_filename, collection_name):
         logging.error(f"Error uploading to MongoDB: {e}")
 
 # Schedule the scripts to run at the same time
-schedule.every().day.at("17:50").do(run_scrapy_script1)
-schedule.every().day.at("17:50").do(run_scrapy_script2)
+schedule.every().day.at("18:15").do(run_scrapy_script1)
+schedule.every().day.at("18:15").do(run_scrapy_script2)
 
 # Keep the script running to maintain the schedule
 while True:

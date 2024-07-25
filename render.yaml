@@ -1,13 +1,4 @@
 services:
-  - type: cron
-    name: scraper-scheduler
-    schedule: "0 23 * * *"
-    startCommand: "python ./schedular_run/schedule_run.py"
-    envVars:
-      - key: MONGO_URI
-        value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
-    runtime: python
-
   - type: worker
     name: scraper-worker
     env: python
@@ -17,4 +8,3 @@ services:
     envVars:
       - key: MONGO_URI
         value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
-
