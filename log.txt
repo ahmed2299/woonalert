@@ -1,0 +1,37 @@
+2024-07-25 14:51:00,648 - INFO - Starting pararius spider script
+2024-07-25 14:51:00,741 - INFO - Uploading pararius_data.json to MongoDB collection pararius_collection
+2024-07-25 14:51:01,052 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'pararius_data.json'
+2024-07-25 14:51:01,053 - INFO - Finished pararius spider script
+2024-07-25 14:51:01,053 - INFO - Starting funda spider script
+2024-07-25 14:51:01,132 - INFO - Uploading funda_data.json to MongoDB collection funda_collection
+2024-07-25 14:51:01,183 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'funda_data.json'
+2024-07-25 14:51:01,183 - INFO - Finished funda spider script
+2024-07-25 14:54:00,473 - INFO - Starting pararius spider script
+2024-07-25 14:54:00,576 - INFO - Uploading pararius_data.json to MongoDB collection pararius_collection
+2024-07-25 14:54:00,998 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'pararius_data.json'
+2024-07-25 14:54:00,999 - INFO - Finished pararius spider script
+2024-07-25 14:54:00,999 - INFO - Starting funda spider script
+2024-07-25 14:54:01,104 - INFO - Uploading funda_data.json to MongoDB collection funda_collection
+2024-07-25 14:54:01,205 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'funda_data.json'
+2024-07-25 14:54:01,205 - INFO - Finished funda spider script
+2024-07-25 14:56:00,882 - INFO - Starting pararius spider script
+2024-07-25 14:56:00,990 - INFO - Uploading pararius_data.json to MongoDB collection pararius_collection
+2024-07-25 14:56:01,218 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'pararius_data.json'
+2024-07-25 14:56:01,218 - INFO - Finished pararius spider script
+2024-07-25 14:56:01,218 - INFO - Starting funda spider script
+2024-07-25 14:56:01,306 - INFO - Uploading funda_data.json to MongoDB collection funda_collection
+2024-07-25 14:56:01,359 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'funda_data.json'
+2024-07-25 14:56:01,359 - INFO - Finished funda spider script
+2024-07-25 14:58:00,283 - INFO - Starting pararius spider script
+2024-07-25 14:58:00,386 - INFO - Uploading pararius_data.json to MongoDB collection pararius_collection
+2024-07-25 14:58:00,655 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'pararius_data.json'
+2024-07-25 14:58:00,656 - INFO - Finished pararius spider script
+2024-07-25 14:58:00,656 - INFO - Starting funda spider script
+2024-07-25 14:58:00,777 - INFO - Uploading funda_data.json to MongoDB collection funda_collection
+2024-07-25 14:58:00,841 - ERROR - Error uploading to MongoDB: [Errno 2] No such file or directory: 'funda_data.json'
+2024-07-25 14:58:00,841 - INFO - Finished funda spider script
+2024-07-25 15:00:00,077 - INFO - Starting pararius spider script
+2024-07-25 15:00:05,835 - INFO - Uploading pararius_data.json to MongoDB collection pararius_collection
+2024-07-25 15:00:09,003 - INFO - Uploaded pararius_data.json to MongoDB collection pararius_collection
+2024-07-25 15:00:09,003 - INFO - Finished pararius spider script
+2024-07-25 15:00:09,003 - INFO - Starting funda spider script
