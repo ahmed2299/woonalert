@@ -1,11 +1,14 @@
-import os
+from pymongo.errors import  PyMongoError
+
 import schedule
 import time
 import subprocess
 import json
+import os
+import logging
 from pymongo import MongoClient
-from pymongo.errors import  PyMongoError
-
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+import threading
 # Get the directory where the script is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -61,12 +64,26 @@ def upload_to_mongo(json_filename, collection_name):
         print(f"Error decoding JSON file: {e}")
 
 # Schedule the first script to run at a specific time
-schedule.every().day.at("00:00").do(run_scrapy_script1)
+schedule.every().day.at("00:08").do(run_scrapy_script1)
 
 # Schedule the second script to run at a different time
-schedule.every().day.at("00:00").do(run_scrapy_script2)  # Changed time for sequential execution
+schedule.every().day.at("00:08").do(run_scrapy_script2)  # Changed time for sequential execution
 
 # Keep the script running to maintain the schedule
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+def run_server():
+    handler = SimpleHTTPRequestHandler
+    httpd = HTTPServer(('0.0.0.0', 8000), handler)
+    httpd.serve_forever()
+
+if __name__ == "__main__":
+    # Start the scheduler in a separate thread
+    scheduler_thread = threading.Thread(target=run_scheduler)
+    scheduler_thread.start()
+
+    # Start the HTTP server
+    run_server()
