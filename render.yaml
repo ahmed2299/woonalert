@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python ./schedular_run/schedule_run.py"
+    startCommand: "python schedule_run.py"
     envVars:
       - key: MONGO_URI
         value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
@@ -16,7 +16,7 @@ services:
     schedule: "10 20 * * *"
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python ./schedular_run/schedule_run.py"
+    startCommand: "python schedule_run.py"
     envVars:
       - key: MONGO_URI
         value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
@@ -25,7 +25,7 @@ services:
     name: scraper-worker
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python ./schedular_run/schedule_run.py"
+    startCommand: "python schedule_run.py"
     envVars:
       - key: MONGO_URI
         value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
