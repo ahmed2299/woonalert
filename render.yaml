@@ -1,6 +1,6 @@
 services:
-  - type: worker
-    name: scraper-worker
+  - type: web
+    name: scraper-service
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
@@ -8,3 +8,5 @@ services:
     envVars:
       - key: MONGO_URI
         value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0"
+    ports:
+      - port: 8000
