@@ -9,7 +9,6 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 from datetime import datetime
 from lxml import html
-import subprocess
 
 class ParariusSpider(scrapy.Spider):
     name = "pararius"

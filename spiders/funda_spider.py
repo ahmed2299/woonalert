@@ -13,7 +13,6 @@ from scrapy.crawler import CrawlerProcess
 from requests_html import HTMLSession
 from datetime import datetime
 from lxml import html
-import subprocess
 
 class FundaSpider(scrapy.Spider):
     name = "funda"
@@ -26,6 +25,7 @@ class FundaSpider(scrapy.Spider):
         'RETRY_TIMES': 5,  # Number of retries
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'REQUEST_FINGERPRINTER_IMPLEMENTATION' : '2.7'
     }
 
     def __init__(self):

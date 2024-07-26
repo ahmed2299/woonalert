@@ -81,12 +81,14 @@ def run_server():
 if __name__ == "__main__":
     # Start the scheduler in a separate thread
     if os.getenv('RENDER_CRON'):
-        run_scrapy_script1()
         run_scrapy_script2()
+        run_scrapy_script1()
+
     else:
         # Start the scheduler in a separate thread
-        run_scrapy_script1()
         run_scrapy_script2()
+        run_scrapy_script1()
+
 
     # Start the HTTP server
     run_server()
