@@ -55,7 +55,7 @@ class FundaSpider(scrapy.Spider):
         self.search_result = 1
         self.existing_data = []
         self.new_data = []
-
+        self.items=[]
     def start_requests(self):
         # Load existing data
         if os.path.exists('funda_data.json'):
@@ -84,7 +84,7 @@ class FundaSpider(scrapy.Spider):
                     body=page_content, encoding='utf-8')
                 self.logger.info(f'Fetched page {self.search_result}')
 
-                if response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get():
+                if response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get() or len(self.items)==0:
                     self.logger.info("No more 'Vandaag' listings found, breaking loop")
                     break
 
@@ -100,11 +100,11 @@ class FundaSpider(scrapy.Spider):
         self.logger.info("Populating items for FundaSpider")
         response = response.meta["response"]
 
-        items = response.xpath(
+        self.items = response.xpath(
             '//div[@class="pt-4"]//div[contains(text(),"Vandaag")]/../../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]').getall()
-        self.logger.info(f'Found {len(items)} items')
-        if items:
-            for item in items[1:]:
+        self.logger.info(f'Found {len(self.items)} items')
+        if self.items:
+            for item in self.items[1:]:
                 item_element = html.fromstring(item)
                 Domain = "funda"
                 title = item_element.xpath('//h2[@data-test-id="street-name-house-number"]/text()')
@@ -133,7 +133,7 @@ class FundaSpider(scrapy.Spider):
                     yield scraped_item
 
 
-            self.logger.info(f"Scraped items: {items}")
+            self.logger.info(f"Scraped items: {self.items}")
             self.logger.info(f"page number: {self.search_result}")
 
     def close(self, reason):
