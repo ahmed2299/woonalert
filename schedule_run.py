@@ -73,10 +73,10 @@ def run_scheduler():
         schedule.run_pending()
         time.sleep(1)
 
-def run_server():
-    handler = SimpleHTTPRequestHandler
-    httpd = HTTPServer(('0.0.0.0', 8000), handler)
-    httpd.serve_forever()
+# def run_server():
+#     handler = SimpleHTTPRequestHandler
+#     httpd = HTTPServer(('0.0.0.0', 8000), handler)
+#     httpd.serve_forever()
 
 if __name__ == "__main__":
     # Start the scheduler in a separate thread
@@ -84,12 +84,9 @@ if __name__ == "__main__":
         run_scrapy_script2()
         # run_scrapy_script1()
 
-
     else:
         # Start the scheduler in a separate thread
         run_scrapy_script2()
         # run_scrapy_script1()
 
-
-    # Start the HTTP server
-    run_server()
+    # run_server()
