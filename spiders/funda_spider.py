@@ -22,7 +22,7 @@ class FundaSpider(scrapy.Spider):
         'ROBOTSTXT_OBEY': False,
         'RETRY_ENABLED': True,
         'RETRY_TIMES': 5,
-        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429, 443],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'DOWNLOADER_MIDDLEWARES': {'middlewares.ProxyMiddleware': 543},
         'DOWNLOAD_DELAY': 1,
