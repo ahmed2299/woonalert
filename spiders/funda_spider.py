@@ -16,25 +16,17 @@ class FundaSpider(scrapy.Spider):
     start_urls = [
         'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1',
     ]
+    # custom_settings = {
+    #     'ROBOTSTXT_OBEY': False,
+    #     'RETRY_ENABLED': True,
+    #     'RETRY_TIMES': 5,  # Number of retries
+    #     'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
+    #     'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    #     'REQUEST_FINGERPRINTER_IMPLEMENTATION' : "2.7"
+    # }
+
     custom_settings = {
-        'ROBOTSTXT_OBEY': False,
-        'RETRY_ENABLED': True,
-        'RETRY_TIMES': 5,  # Number of retries
-        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
-        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
-        'CONCURRENT_REQUESTS': 16,  # Number of concurrent requests
-        'DOWNLOAD_DELAY': 1,  # Delay between requests to the same domain
-        'AUTOTHROTTLE_ENABLED': True,  # Enable AutoThrottle
-        'AUTOTHROTTLE_START_DELAY': 1,  # Initial download delay
-        'AUTOTHROTTLE_MAX_DELAY': 60,  # Maximum download delay
-        'AUTOTHROTTLE_TARGET_CONCURRENCY': 1.0,  # Average number of requests sent in parallel to each remote server
-        'AUTOTHROTTLE_DEBUG': False,  # Enable showing throttling stats for every response received
-        'HTTPCACHE_ENABLED': True,  # Enable HTTP caching
-        'HTTPCACHE_EXPIRATION_SECS': 0,  # Cache never expires
-        'HTTPCACHE_DIR': 'httpcache',  # Directory for storing the cache
-        'HTTPCACHE_IGNORE_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],  # Don't cache these response codes
-        'HTTPCACHE_STORAGE': 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+        'ROBOTSTXT_OBEY': False
     }
 
     def __init__(self):
@@ -44,19 +36,15 @@ class FundaSpider(scrapy.Spider):
         self.new_data = []
 
     def start_requests(self):
-        # self.log("Starting requests...", level=scrapy.log.INFO)
         # Load existing data
         if os.path.exists('funda_data.json'):
-            # self.log("funda_data.json exists, loading data...", level=scrapy.log.INFO)
             with open('funda_data.json', 'r') as file:
                 try:
                     self.existing_data = json.load(file)
-                except json.JSONDecodeError as e:
-                    # self.log(f"Error loading funda_data.json: {e}", level=scrapy.log.ERROR)
+                except json.JSONDecodeError:
                     self.existing_data = []
 
         for url in self.start_urls:
-            # self.log(f"Requesting URL: {url}", level=scrapy.log.INFO)
             yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
@@ -100,11 +88,9 @@ class FundaSpider(scrapy.Spider):
         # Follow the next page link
         self.search_result += 1
         next_page = f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}'
-        # self.log(f"Requesting next page: {next_page}", level=scrapy.log.INFO)
         yield scrapy.Request(next_page, callback=self.parse)
 
     def close(self, reason):
-        # self.log(f"Spider closed: {reason}", level=scrapy.log.INFO)
         # Combine existing data with new data
         combined_data = self.existing_data + self.new_data
 
