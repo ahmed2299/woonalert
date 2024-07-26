@@ -8,7 +8,6 @@ from lxml import html
 import scrapy
 from scrapy.http import HtmlResponse
 from scrapy.crawler import CrawlerProcess
-from requests_html import HTMLSession
 
 # Add the directory containing 'helper' to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -44,8 +43,9 @@ class FundaSpider(scrapy.Spider):
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'DOWNLOADER_MIDDLEWARES': {
             '__main__.ProxyMiddleware': 543,
+            'middlewares.RetryMiddleware': 544,
         },
-        'REQUEST_FINGERPRINTER_IMPLEMENTATION' : '2.7',
+        'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
         'DOWNLOAD_DELAY': 1,
         'LOG_LEVEL': 'INFO',
     }
@@ -55,7 +55,7 @@ class FundaSpider(scrapy.Spider):
         self.search_result = 1
         self.existing_data = []
         self.new_data = []
-        self.items=[]
+
     def start_requests(self):
         # Load existing data
         if os.path.exists('funda_data.json'):
@@ -71,40 +71,12 @@ class FundaSpider(scrapy.Spider):
 
     def parse(self, response):
         self.logger.info("Parsing FundaSpider response")
-        session = HTMLSession()
-        try:
-            while True:
-                self.logger.debug(f"Fetching page {self.search_result}")
-                response_html = session.get(response.url, timeout=30)
-                response_html.raise_for_status()  # Ensure we catch any HTTP errors
-                time.sleep(random.uniform(0.3, 0.6))
-                page_content = response_html.text
-                response = HtmlResponse(
-                    url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
-                    body=page_content, encoding='utf-8')
-                self.logger.info(f'Fetched page {self.search_result}')
-
-                if response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get() or len(self.items)==0:
-                    self.logger.info("No more 'Vandaag' listings found, breaking loop")
-                    break
-
-                yield scrapy.Request(
-                    url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
-                    callback=self.populate_item, meta={"response": response})
-
-                self.search_result += 1
-        except Exception as e:
-            self.logger.error(f"Error during parsing: {e}")
-
-    def populate_item(self, response):
-        self.logger.info("Populating items for FundaSpider")
-        response = response.meta["response"]
-
-        self.items = response.xpath(
+        items = response.xpath(
             '//div[@class="pt-4"]//div[contains(text(),"Vandaag")]/../../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]').getall()
-        self.logger.info(f'Found {len(self.items)} items')
-        if self.items:
-            for item in self.items[1:]:
+        self.logger.info(f'Found {len(items)} items')
+
+        if items:
+            for item in items[1:]:
                 item_element = html.fromstring(item)
                 Domain = "funda"
                 title = item_element.xpath('//h2[@data-test-id="street-name-house-number"]/text()')
@@ -132,9 +104,12 @@ class FundaSpider(scrapy.Spider):
                     self.new_data.append(scraped_item)
                     yield scraped_item
 
-
-            self.logger.info(f"Scraped items: {self.items}")
-            self.logger.info(f"page number: {self.search_result}")
+            # Move to the next page if items are found
+            next_page = response.url.split('search_result=')[0] + f'search_result={self.search_result + 1}'
+            self.search_result += 1
+            yield scrapy.Request(next_page, callback=self.parse)
+        else:
+            self.logger.info("No more 'Vandaag' listings found, stopping spider")
 
     def close(self, reason):
         # Combine existing data with new data
