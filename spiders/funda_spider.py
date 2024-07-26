@@ -37,6 +37,13 @@ class FundaSpider(scrapy.Spider):
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15',
             # Add more user agents here
         ]),
+        'DEFAULT_REQUEST_HEADERS': {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            # Add more headers as needed
+        },
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
         'CONCURRENT_REQUESTS': 16,
         'DOWNLOAD_DELAY': 1,
@@ -49,9 +56,14 @@ class FundaSpider(scrapy.Spider):
         'HTTPCACHE_EXPIRATION_SECS': 0,
         'HTTPCACHE_DIR': 'httpcache',
         'HTTPCACHE_IGNORE_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
-        'HTTPCACHE_STORAGE': 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-    }
+        'HTTPCACHE_STORAGE': 'scrapy.extensions.httpcache.FilesystemCacheStorage',
+        'DOWNLOADER_MIDDLEWARES': {
+            'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 1,
+        },
+        'HTTPPROXY_ENABLED': True,
+        'HTTP_PROXY': '104.167.26.204:3128'
 
+    }
     def __init__(self):
         super().__init__()
         self.search_result = 1
