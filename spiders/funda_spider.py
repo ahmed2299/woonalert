@@ -16,17 +16,13 @@ class FundaSpider(scrapy.Spider):
     start_urls = [
         'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1',
     ]
-    # custom_settings = {
-    #     'ROBOTSTXT_OBEY': False,
-    #     'RETRY_ENABLED': True,
-    #     'RETRY_TIMES': 5,  # Number of retries
-    #     'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
-    #     'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    #     'REQUEST_FINGERPRINTER_IMPLEMENTATION' : "2.7"
-    # }
-
     custom_settings = {
-        'ROBOTSTXT_OBEY': False
+        'ROBOTSTXT_OBEY': False,
+        'RETRY_ENABLED': True,
+        'RETRY_TIMES': 5,  # Number of retries
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
+        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'REQUEST_FINGERPRINTER_IMPLEMENTATION' : "2.7"
     }
 
     def __init__(self):
