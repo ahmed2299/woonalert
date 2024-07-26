@@ -13,7 +13,7 @@ services:
     name: scrapy-cron
     runtime: python
     plan: free
-    schedule: "0 8 * * *"  # Runs daily at 10:50 AM GMT+3
+    schedule: "15 8 * * *"  # Runs daily at 10:50 AM GMT+3
     startCommand: "python schedule_script.py"
     envVars:
       - key: MONGO_URI
