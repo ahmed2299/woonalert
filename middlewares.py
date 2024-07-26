@@ -28,7 +28,7 @@ class RetryMiddleware:
         if not items:
             spider.logger.info(f"No items found, retrying {request.url}")
             retries = request.meta.get('retry_times', 0)
-            if retries < 5:
+            if retries < 20:
                 retries += 1
                 new_request = request.copy()
                 new_request.meta['retry_times'] = retries
