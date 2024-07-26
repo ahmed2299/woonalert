@@ -25,7 +25,7 @@ def run_scrapy_script2():
     try:
         logging.info("Starting funda spider script")
         # Command to run your second Scrapy script
-        command2 = 'python spiders/funda_spider.py'
+        command2 = 'python spiders/main.py'
         subprocess.run(command2, shell=True)
         # After running the script, upload the output JSON to MongoDB
         upload_to_mongo('funda_data.json', 'funda_collection')
@@ -33,6 +33,7 @@ def run_scrapy_script2():
 
         upload_to_mongo('pararius_data.json', 'pararius_collection')
         logging.info("Finished pararius spider script")
+
     except Exception as e:
         logging.error(f"Error running funda script: {e}")
 
