@@ -105,17 +105,17 @@ class FundaSpider(scrapy.Spider):
             json.dump(combined_data, file, indent=4)
 
 
-# def scrape_funda():
-#     process = CrawlerProcess()
-#     process.crawl(FundaSpider)
-#     process.start()
-#
-# if __name__ == "__main__":
-#     scrape_funda()
-
-
 def scrape_funda():
-    subprocess.run(["scrapy", "crawl", "funda"])
+    process = CrawlerProcess()
+    process.crawl(FundaSpider)
+    process.start()
 
 if __name__ == "__main__":
     scrape_funda()
+
+
+# def scrape_funda():
+#     subprocess.run(["scrapy", "crawl", "funda"])
+#
+# if __name__ == "__main__":
+#     scrape_funda()
