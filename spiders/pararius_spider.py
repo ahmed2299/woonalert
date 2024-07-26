@@ -26,6 +26,7 @@ class ParariusSpider(scrapy.Spider):
         'LOG_LEVEL': 'INFO',
     }
 
+
     def __init__(self):
         super().__init__()
         self.existing_data = self.load_existing_data('pararius_data.json')

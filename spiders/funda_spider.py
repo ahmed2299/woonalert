@@ -15,7 +15,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Now you can import 'helper' from the correct path
 import helper
 
-
 class FundaSpider(scrapy.Spider):
     name = "funda"
     start_urls = ['https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1']
