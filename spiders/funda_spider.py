@@ -22,7 +22,8 @@ class FundaSpider(scrapy.Spider):
         'RETRY_TIMES': 5,  # Number of retries
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'REQUEST_FINGERPRINTER_IMPLEMENTATION' : "2.7"
+        'REQUEST_FINGERPRINTER_IMPLEMENTATION' : "2.7",
+        'CONCURRENT_REQUESTS': 16,  # Number of concurrent requests
     }
 
     def __init__(self):
