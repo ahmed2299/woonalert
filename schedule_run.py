@@ -15,7 +15,7 @@ def run_scrapy_script1():
     try:
         logging.info("Starting pararius spider script")
         # Command to run your first Scrapy script
-        command1 = 'python3 spiders/pararius_spider.py'
+        command1 = 'python spiders/pararius_spider.py'
         subprocess.run(command1, shell=True)
         # After running the script, upload the output JSON to MongoDB
         upload_to_mongo('pararius_data.json', 'pararius_collection')
@@ -27,7 +27,7 @@ def run_scrapy_script2():
     try:
         logging.info("Starting funda spider script")
         # Command to run your second Scrapy script
-        command2 = 'python3 spiders/funda_spider.py'
+        command2 = 'python spiders/funda_spider.py'
         subprocess.run(command2, shell=True)
         # After running the script, upload the output JSON to MongoDB
         upload_to_mongo('funda_data.json', 'funda_collection')
@@ -39,7 +39,7 @@ def upload_to_mongo(json_filename, collection_name):
     try:
         logging.info(f"Uploading {json_filename} to MongoDB collection {collection_name}")
         # Connect to MongoDB using the environment variable
-        mongo_uri = os.getenv('MONGO_URI', 'default_mongo_uri')
+        mongo_uri = os.getenv('MONGO_URI', 'mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0')
         client = MongoClient(mongo_uri)
         db = client['RealEstateDB']
         collection = db[collection_name]
@@ -65,9 +65,8 @@ def upload_to_mongo(json_filename, collection_name):
         logging.error(f"Error uploading to MongoDB: {e}")
 
 # Schedule the scripts to run at the same time
-schedule.every(5).minutes.at(":05").do(run_scrapy_script1)
-# schedule.every().day.at("02:00").do(run_scrapy_script1)
-# schedule.every().day.at("02:00").do(run_scrapy_script2)
+schedule.every().day.at("07:30").do(run_scrapy_script1)
+schedule.every().day.at("07:30").do(run_scrapy_script2)
 
 def run_scheduler():
     while True:

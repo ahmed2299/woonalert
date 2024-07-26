@@ -8,3 +8,13 @@ services:
     envVars:
       - key: MONGO_URI
         value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0" # Replace with your MongoDB URI
+
+  - type: cron
+    name: scrapy-cron
+    runtime: python
+    plan: free
+    schedule: "30 7 * * *"
+    startCommand: "python schedule_script.py"
+    envVars:
+      - key: MONGO_URI
+        value: "mongodb+srv://Gabriel:4wqUjZxSZ87Tcx0X@cluster0.nrvhn6m.mongodb.net/RealEstateDB?retryWrites=true&w=majority&appName=Cluster0" # Replace with your MongoDB URI
