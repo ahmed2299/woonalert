@@ -9,22 +9,47 @@ from scrapy.crawler import CrawlerProcess
 from datetime import datetime
 from lxml import html
 import helper
-
+import random
 
 class FundaSpider(scrapy.Spider):
     name = "funda"
     start_urls = [
         'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1',
     ]
+    # custom_settings = {
+    #     'ROBOTSTXT_OBEY': False,
+    #     'RETRY_ENABLED': True,
+    #     'RETRY_TIMES': 5,  # Number of retries
+    #     'RETRY_HTTP_CODES': [200, 500, 502, 503, 504, 522, 524, 408, 429],
+    #     'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    #     'REQUEST_FINGERPRINTER_IMPLEMENTATION' : "2.7",
+    #     'CONCURRENT_REQUESTS': 16,
+    #     'DOWNLOAD_DELAY': 1
+    # }
+
     custom_settings = {
         'ROBOTSTXT_OBEY': False,
         'RETRY_ENABLED': True,
-        'RETRY_TIMES': 5,  # Number of retries
-        'RETRY_HTTP_CODES': [200, 500, 502, 503, 504, 522, 524, 408, 429],
-        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'REQUEST_FINGERPRINTER_IMPLEMENTATION' : "2.7",
+        'RETRY_TIMES': 5,
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
+        'USER_AGENT': random.choice([
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15',
+            # Add more user agents here
+        ]),
+        'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
         'CONCURRENT_REQUESTS': 16,
-        'DOWNLOAD_DELAY': 1
+        'DOWNLOAD_DELAY': 1,
+        'AUTOTHROTTLE_ENABLED': True,
+        'AUTOTHROTTLE_START_DELAY': 1,
+        'AUTOTHROTTLE_MAX_DELAY': 60,
+        'AUTOTHROTTLE_TARGET_CONCURRENCY': 1.0,
+        'AUTOTHROTTLE_DEBUG': False,
+        'HTTPCACHE_ENABLED': True,
+        'HTTPCACHE_EXPIRATION_SECS': 0,
+        'HTTPCACHE_DIR': 'httpcache',
+        'HTTPCACHE_IGNORE_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
+        'HTTPCACHE_STORAGE': 'scrapy.extensions.httpcache.FilesystemCacheStorage'
     }
 
     def __init__(self):
