@@ -83,7 +83,8 @@ class FundaSpider(scrapy.Spider):
                     url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
                     body=page_content, encoding='utf-8')
                 self.logger.info(f'Fetched page {self.search_result}')
-                if response.xpath("//p[contains(text(),'Geen resultaten gevonden')]").get():
+
+                if response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get():
                     self.logger.info("No more 'Vandaag' listings found, breaking loop")
                     break
 
