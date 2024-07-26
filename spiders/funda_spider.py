@@ -36,15 +36,15 @@ class FundaSpider(scrapy.Spider):
     start_urls = [
         'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1',
     ]
+
     custom_settings = {
         'ROBOTSTXT_OBEY': False,
         'RETRY_ENABLED': True,
-        'RETRY_TIMES': 10,
+        'RETRY_TIMES': 10,  # Number of retries
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
         'CONCURRENT_REQUESTS': 16,
-        'DOWNLOAD_DELAY': 1,
         'AUTOTHROTTLE_ENABLED': True,
         'AUTOTHROTTLE_START_DELAY': 5,
         'AUTOTHROTTLE_MAX_DELAY': 60,
@@ -53,12 +53,13 @@ class FundaSpider(scrapy.Spider):
         'HTTPCACHE_ENABLED': True,
         'HTTPCACHE_EXPIRATION_SECS': 0,
         'HTTPCACHE_DIR': 'httpcache',
-        'HTTPCACHE_IGNORE_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'HTTPCACHE_STORAGE': 'scrapy.extensions.httpcache.FilesystemCacheStorage',
+        'HTTPCACHE_IGNORE_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'DOWNLOADER_MIDDLEWARES': {
-            'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 1,
-            'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 2,
-        }
+            '__main__.ProxyMiddleware': 543,
+        },
+        'DOWNLOAD_DELAY': 1,
+        'LOG_LEVEL': 'INFO',
     }
 
     def __init__(self):
