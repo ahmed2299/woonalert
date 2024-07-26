@@ -68,6 +68,5 @@ def run_scheduler():
         time.sleep(1)
 
 if __name__ == "__main__":
-
-    run_scrapy_script2()
     run_scrapy_script1()
+    run_scrapy_script2()

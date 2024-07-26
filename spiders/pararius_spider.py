@@ -1,14 +1,32 @@
 import json
 import os
 import sys
+import random
+from datetime import datetime
+from lxml import html
+import scrapy
+from scrapy.crawler import CrawlerProcess
+
 # Add the directory containing 'helper' to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Now you can import 'helper' from the correct path
 import helper
-import scrapy
-from scrapy.crawler import CrawlerProcess
-from datetime import datetime
-from lxml import html
+
+class ProxyMiddleware:
+    def __init__(self):
+        self.proxies = []
+        with open('proxies.txt') as f:
+            self.proxies = [line.strip() for line in f]
+
+    def process_request(self, request, spider):
+        if not self.proxies:
+            raise ValueError("No proxies found in proxies.txt file")
+        proxy = random.choice(self.proxies)
+        username_password, proxy_url, port = proxy.split('@')[0], proxy.split('@')[1].split(':')[0], proxy.split(':')[-1]
+        username, password = username_password.split(':')
+        proxy_address = f"http://{username}:{password}@{proxy_url}:{port}"
+        request.meta['proxy'] = proxy_address
+        spider.logger.info(f'Using proxy: {proxy_address}')
 
 class ParariusSpider(scrapy.Spider):
     name = "pararius"
@@ -21,6 +39,11 @@ class ParariusSpider(scrapy.Spider):
         'RETRY_TIMES': 5,  # Number of retries
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'DOWNLOADER_MIDDLEWARES': {
+            '__main__.ProxyMiddleware': 543,
+        },
+        'DOWNLOAD_DELAY': 1,
+        'LOG_LEVEL': 'INFO',
     }
 
     def __init__(self):
@@ -92,10 +115,3 @@ def scrape_pararius():
 
 if __name__ == "__main__":
     scrape_pararius()
-
-# def scrape_funda():
-#     subprocess.run(["scrapy", "crawl", "pararius"])
-#
-# if __name__ == "__main__":
-#     scrape_funda()
-
