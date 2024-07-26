@@ -15,6 +15,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Now you can import 'helper' from the correct path
 import helper
 
+
 class FundaSpider(scrapy.Spider):
     name = "funda"
     start_urls = ['https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1']
@@ -22,7 +23,7 @@ class FundaSpider(scrapy.Spider):
         'ROBOTSTXT_OBEY': False,
         'RETRY_ENABLED': True,
         'RETRY_TIMES': 5,
-        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429, 443],
+        'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'DOWNLOADER_MIDDLEWARES': {'middlewares.ProxyMiddleware': 543},
         'DOWNLOAD_DELAY': 1,
@@ -54,20 +55,25 @@ class FundaSpider(scrapy.Spider):
     def parse(self, response):
         self.logger.info("Parsing FundaSpider response")
         session = HTMLSession()
-        while True:
-            response_html = session.get(response.url)
-            time.sleep(random.uniform(0.3, 0.6))
-            page_content = response_html.text
-            response = HtmlResponse(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
-                                    body=page_content, encoding='utf-8')
-            self.logger.info(f'Fetched page {self.search_result}')
-            if response.xpath('//div[@class="pt-4"]//div[contains(text(),"Vandaag")]').get() is None:
-                self.logger.info("No more 'Vandaag' listings found, breaking loop")
-                break
+        try:
+            while True:
+                self.logger.debug(f"Fetching page {self.search_result}")
+                response_html = session.get(response.url, timeout=30)
+                response_html.raise_for_status()  # Ensure we catch any HTTP errors
+                time.sleep(random.uniform(0.3, 0.6))
+                page_content = response_html.text
+                response = HtmlResponse(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
+                                        body=page_content, encoding='utf-8')
+                self.logger.info(f'Fetched page {self.search_result}')
+                if response.xpath('//div[@class="pt-4"]//div[contains(text(),"Vandaag")]').get() is None:
+                    self.logger.info("No more 'Vandaag' listings found, breaking loop")
+                    break
 
-            yield scrapy.Request(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}', callback=self.populate_item, meta={"response": response})
+                yield scrapy.Request(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}', callback=self.populate_item, meta={"response": response})
 
-            self.search_result += 1
+                self.search_result += 1
+        except Exception as e:
+            self.logger.error(f"Error during parsing: {e}")
 
     def populate_item(self, response):
         self.logger.info("Populating items for FundaSpider")
