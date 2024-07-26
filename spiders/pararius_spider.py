@@ -15,7 +15,7 @@ import helper
 class ProxyMiddleware:
     def __init__(self):
         self.proxies = []
-        with open('proxies.txt') as f:
+        with open('../proxies.txt') as f:
             self.proxies = [line.strip() for line in f]
 
     def process_request(self, request, spider):
