@@ -30,6 +30,9 @@ def run_scrapy_script2():
         # After running the script, upload the output JSON to MongoDB
         upload_to_mongo('funda_data.json', 'funda_collection')
         logging.info("Finished funda spider script")
+
+        upload_to_mongo('pararius_data.json', 'pararius_collection')
+        logging.info("Finished pararius spider script")
     except Exception as e:
         logging.error(f"Error running funda script: {e}")
 
@@ -68,5 +71,5 @@ def run_scheduler():
         time.sleep(1)
 
 if __name__ == "__main__":
-    run_scrapy_script1()
+    # run_scrapy_script1()
     run_scrapy_script2()
