@@ -5,8 +5,6 @@ import json
 import os
 import logging
 from pymongo import MongoClient
-from http.server import SimpleHTTPRequestHandler, HTTPServer
-import threading
 
 # Configure logging
 logging.basicConfig(filename='log.txt', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -64,29 +62,12 @@ def upload_to_mongo(json_filename, collection_name):
     except Exception as e:
         logging.error(f"Error uploading to MongoDB: {e}")
 
-# Schedule the scripts to run at the same time
-# schedule.every().day.at("08:00").do(run_scrapy_script1)
-# schedule.every().day.at("08:00").do(run_scrapy_script2)
-
 def run_scheduler():
     while True:
         schedule.run_pending()
         time.sleep(1)
 
-# def run_server():
-#     handler = SimpleHTTPRequestHandler
-#     httpd = HTTPServer(('0.0.0.0', 8000), handler)
-#     httpd.serve_forever()
-
 if __name__ == "__main__":
-    # Start the scheduler in a separate thread
-    if os.getenv('RENDER_CRON'):
-        run_scrapy_script2()
-        # run_scrapy_script1()
 
-    else:
-        # Start the scheduler in a separate thread
-        run_scrapy_script2()
-        # run_scrapy_script1()
-
-    # run_server()
+    run_scrapy_script2()
+    run_scrapy_script1()
