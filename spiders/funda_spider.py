@@ -15,41 +15,59 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Now you can import 'helper' from the correct path
 import helper
 
+class ProxyMiddleware:
+    def __init__(self):
+        self.proxies = []
+        with open('proxies.txt') as f:
+            self.proxies = [line.strip() for line in f]
+
+    def process_request(self, request, spider):
+        if not self.proxies:
+            raise ValueError("No proxies found in proxies.txt file")
+        proxy = random.choice(self.proxies)
+        username_password, proxy_url, port = proxy.split('@')[0], proxy.split('@')[1].split(':')[0], proxy.split(':')[-1]
+        username, password = username_password.split(':')
+        proxy_address = f"http://{username}:{password}@{proxy_url}:{port}"
+        request.meta['proxy'] = proxy_address
+        spider.logger.info(f'Using proxy: {proxy_address}')
+
 class FundaSpider(scrapy.Spider):
     name = "funda"
-    start_urls = ['https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1']
+    start_urls = [
+        'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1',
+    ]
     custom_settings = {
         'ROBOTSTXT_OBEY': False,
         'RETRY_ENABLED': True,
-        'RETRY_TIMES': 5,
+        'RETRY_TIMES': 5,  # Number of retries
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'DOWNLOADER_MIDDLEWARES': {'middlewares.ProxyMiddleware': 543},
+        'DOWNLOADER_MIDDLEWARES': {
+            '__main__.ProxyMiddleware': 543,
+        },
+        'REQUEST_FINGERPRINTER_IMPLEMENTATION' : '2.7',
         'DOWNLOAD_DELAY': 1,
         'LOG_LEVEL': 'INFO',
-        'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7'
     }
 
     def __init__(self):
         super().__init__()
         self.search_result = 1
-        self.existing_data = self.load_existing_data('funda_data.json')
+        self.existing_data = []
         self.new_data = []
 
-    def load_existing_data(self, file_name):
-        if os.path.exists(file_name):
-            self.logger.info(f"Loading existing data from {file_name}")
-            with open(file_name, 'r') as file:
+    def start_requests(self):
+        # Load existing data
+        if os.path.exists('funda_data.json'):
+            self.logger.info(f"Loading existing data from funda_data.json")
+            with open('funda_data.json', 'r') as file:
                 try:
-                    return json.load(file)
+                    self.existing_data = json.load(file)
                 except json.JSONDecodeError:
-                    return []
-        return []
+                    self.existing_data = []
 
-    def save_data(self, data, file_name):
-        self.logger.info(f"Saving data to {file_name}")
-        with open(file_name, 'w') as file:
-            json.dump(data, file, indent=4)
+        for url in self.start_urls:
+            yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
         self.logger.info("Parsing FundaSpider response")
@@ -61,14 +79,17 @@ class FundaSpider(scrapy.Spider):
                 response_html.raise_for_status()  # Ensure we catch any HTTP errors
                 time.sleep(random.uniform(0.3, 0.6))
                 page_content = response_html.text
-                response = HtmlResponse(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
-                                        body=page_content, encoding='utf-8')
+                response = HtmlResponse(
+                    url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
+                    body=page_content, encoding='utf-8')
                 self.logger.info(f'Fetched page {self.search_result}')
-                if response.xpath('//div[@class="pt-4"]//div[contains(text(),"Vandaag")]').get() is None:
+                if response.xpath("//p[contains(text(),'Geen resultaten gevonden')]").get():
                     self.logger.info("No more 'Vandaag' listings found, breaking loop")
                     break
 
-                yield scrapy.Request(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}', callback=self.populate_item, meta={"response": response})
+                yield scrapy.Request(
+                    url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
+                    callback=self.populate_item, meta={"response": response})
 
                 self.search_result += 1
         except Exception as e:
@@ -78,7 +99,8 @@ class FundaSpider(scrapy.Spider):
         self.logger.info("Populating items for FundaSpider")
         response = response.meta["response"]
 
-        items = response.xpath('//div[@class="pt-4"]//div[contains(text(),"Vandaag")]/../../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]').getall()
+        items = response.xpath(
+            '//div[@class="pt-4"]//div[contains(text(),"Vandaag")]/../../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]').getall()
         self.logger.info(f'Found {len(items)} items')
         if items:
             for item in items[1:]:
@@ -110,6 +132,19 @@ class FundaSpider(scrapy.Spider):
                     yield scraped_item
 
     def close(self, reason):
+        # Combine existing data with new data
         self.logger.info("Closing FundaSpider")
         combined_data = self.existing_data + self.new_data
-        self.save_data(combined_data, 'funda_data.json')
+
+        # Save the combined data
+        with open('funda_data.json', 'w') as file, os.fdopen(os.open(file.name, os.O_RDWR | os.O_CREAT | os.O_TRUNC, 0o644), 'w') as secure_file:
+            json.dump(combined_data, secure_file, indent=4)
+
+
+def scrape_funda():
+    process = CrawlerProcess()
+    process.crawl(FundaSpider)
+    process.start()
+
+if __name__ == "__main__":
+    scrape_funda()
