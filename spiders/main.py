@@ -1,7 +1,7 @@
 import logging
 from scrapy.crawler import CrawlerProcess
-from spiders.pararius_spider import ParariusSpider
-from spiders.funda_spider import FundaSpider
+from pararius_spider import ParariusSpider
+from funda_spider import FundaSpider
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
