@@ -84,6 +84,7 @@ if __name__ == "__main__":
         run_scrapy_script2()
         # run_scrapy_script1()
 
+
     else:
         # Start the scheduler in a separate thread
         run_scrapy_script2()
