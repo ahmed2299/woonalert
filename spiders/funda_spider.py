@@ -132,6 +132,10 @@ class FundaSpider(scrapy.Spider):
                     self.new_data.append(scraped_item)
                     yield scraped_item
 
+
+            self.logger.info(f"Scraped items: {items}")
+            self.logger.info(f"page number: {self.search_result}")
+
     def close(self, reason):
         # Combine existing data with new data
         self.logger.info("Closing FundaSpider")
