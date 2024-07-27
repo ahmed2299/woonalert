@@ -6,7 +6,6 @@ import time
 from datetime import datetime
 from lxml import html
 import scrapy
-from scrapy.http import HtmlResponse
 from scrapy.crawler import CrawlerProcess
 
 # Add the directory containing 'helper' to the system path
