@@ -86,7 +86,7 @@ class FundaSpider(scrapy.Spider):
                 f.write(response.text)
 
             items = response.xpath(
-                '//div[@class="pt-4"]//div[contains(text(),"Vandaag")]/../../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]')
+                '//div[@class="pt-4"]//../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]')
             self.logger.info(f'Found {len(items)} items')
 
             for item in items:
