@@ -25,8 +25,7 @@ class ProxyMiddleware:
         if not self.proxies:
             raise ValueError("No proxies found in proxies.txt file")
         proxy = random.choice(self.proxies)
-        username_password, proxy_url, port = proxy.split('@')[0], proxy.split('@')[1].split(':')[0], proxy.split(':')[
-            -1]
+        username_password, proxy_url, port = proxy.split('@')[0], proxy.split('@')[1].split(':')[0], proxy.split(':')[-1]
         username, password = username_password.split(':')
         proxy_address = f"http://{username}:{password}@{proxy_url}:{port}"
         request.meta['proxy'] = proxy_address
@@ -85,43 +84,42 @@ class FundaSpider(scrapy.Spider):
             with open(f'response_{self.search_result}.html', 'w', encoding='utf-8') as f:
                 f.write(response.text)
 
-            items = response.xpath(
-                '//div[@class="pt-4"]//../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]')
-            self.logger.info(f'Found {len(items)} items')
+            container = response.xpath('//div[contains(text(),"Vandaag")]/../..').get()
+            if container:
+                container_element = html.fromstring(container)
+                items = container_element.xpath('.//div[@data-test-id="search-result-item"]')  # Adjust the XPath to match the individual item elements
+                self.logger.info(f'Found {len(items)} items')
 
-            for item in items:
-                item_html = item.get()
-                item_element = html.fromstring(item_html)
+                for item in items:
+                    title = item.xpath('.//h2[@data-test-id="street-name-house-number"]/text()')
+                    address = item.xpath('.//div[@data-test-id="postal-code-city"]/text()')
+                    images_srcset = item.xpath('.//img[contains(@class,"w-full")]/@srcset')
+                    link = item.xpath('.//div[@class="flex justify-between"]/a/@href')
+                    price = item.xpath('.//p[@data-test-id="price-sale"]/text()')
+                    time_created = datetime.now().isoformat()
 
-                title = item_element.xpath('.//h2[@data-test-id="street-name-house-number"]/text()')
-                address = item_element.xpath('.//div[@data-test-id="postal-code-city"]/text()')
-                images_srcset = item_element.xpath('.//img[contains(@class,"w-full")]/@srcset')
-                link = item_element.xpath('.//div[@class="flex justify-between"]/a/@href')
-                price = item_element.xpath('.//p[@data-test-id="price-sale"]/text()')
-                time_created = datetime.now().isoformat()
+                    # Extract the first URL from the srcset attribute
+                    image_url = None
+                    if images_srcset:
+                        image_url = images_srcset[0].split(',')[0].strip().split(' ')[0]
 
-                # Extract the first URL from the srcset attribute
-                image_url = None
-                if images_srcset:
-                    image_url = images_srcset[0].split(',')[0].strip().split(' ')[0]
+                    if title:
+                        scraped_item = {
+                            'Domain': 'funda',
+                            'Title': str(title[0]).strip() if title else None,
+                            'Address': str(address[0]).strip() if address else None,
+                            'Image': str(image_url).strip() if image_url else None,
+                            'Link': str(link[0]).strip() if link else None,
+                            'Price': helper.get_price(str(price[0]).replace('.', '')) if price else None,
+                            'Time Created': time_created
+                        }
+                        self.logger.info(f"Scraped item: {scraped_item}")
+                        self.new_data.append(scraped_item)
+                        yield scraped_item
+                    else:
+                        self.logger.info("Incomplete item, skipping.")
 
-                if title and address and price:
-                    scraped_item = {
-                        'Domain': 'funda',
-                        'Title': str(title[0]).strip() if title else None,
-                        'Address': str(address[0]).strip() if address else None,
-                        'Image': str(image_url).strip() if image_url else None,
-                        'Link': str(link[0]).strip() if link else None,
-                        'Price': helper.get_price(str(price[0]).replace('.', '')) if price else None,
-                        'Time Created': time_created
-                    }
-                    self.logger.info(f"Scraped item: {scraped_item}")
-                    self.new_data.append(scraped_item)
-                    yield scraped_item
-                else:
-                    self.logger.info("Incomplete item, skipping.")
-
-            if self.search_result<30:
+            if self.search_result < 30:
                 self.search_result += 1
                 time.sleep(3)
                 yield scrapy.Request(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}', callback=self.parse)
