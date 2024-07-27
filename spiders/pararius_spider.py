@@ -15,7 +15,7 @@ import helper
 class ProxyMiddleware:
     def __init__(self):
         self.proxies = []
-        with open('../proxies.txt') as f:
+        with open('proxies.txt') as f:
             self.proxies = [line.strip() for line in f]
 
     def process_request(self, request, spider):
@@ -57,25 +57,31 @@ class ParariusSpider(scrapy.Spider):
             with open('pararius_data.json', 'r') as file:
                 try:
                     self.existing_data = json.load(file)
+                    self.logger.info("Loaded existing data from pararius_data.json")
                 except json.JSONDecodeError:
                     self.existing_data = []
+                    self.logger.error("Failed to load existing data from pararius_data.json")
 
         for url in self.start_urls:
             yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
         # Pass the response to populate_item
+        self.logger.info("Parsing response")
         yield from self.populate_item(response)
 
         # Get the next page URL and yield a new request
         next_page = response.xpath('//a[@class="pagination__link pagination__link--next"]/@href').get()
         if next_page:
             next_page_url = response.urljoin(next_page)
+            self.logger.info(f"Found next page: {next_page_url}")
             yield scrapy.Request(url=next_page_url, callback=self.parse)
 
     def populate_item(self, response):
         items = response.xpath(
             '//div[@class="page__row page__row--search-list"]//section[@class="listing-search-item listing-search-item--list listing-search-item--for-sale"]').getall()
+
+        self.logger.info(f'Found {len(items)} items')
 
         for item in items:
             item_element = html.fromstring(item)
@@ -98,15 +104,18 @@ class ParariusSpider(scrapy.Spider):
                     'Time Created': time_created
                 }
                 self.new_data.append(scraped_item)
+                self.logger.info(f'Scraped item: {scraped_item}')
                 yield scraped_item
 
     def close(self, reason):
         # Combine existing data with new data
         combined_data = self.existing_data + self.new_data
+        self.logger.info("Closing spider, saving data")
 
         # Save the combined data
         with open('pararius_data.json', 'w') as file:
             json.dump(combined_data, file, indent=4)
+            self.logger.info("Data saved to pararius_data.json")
 
 def scrape_pararius():
     process = CrawlerProcess()
