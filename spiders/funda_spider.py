@@ -77,7 +77,7 @@ class FundaSpider(scrapy.Spider):
         self.logger.info("Parsing FundaSpider response")
         session = HTMLSession()
         try:
-            while True:
+            while self.search_result<20:
                 self.logger.debug(f"Fetching page {self.search_result}")
                 response_html = session.get(response.url, timeout=30)
                 response_html.raise_for_status()  # Ensure we catch any HTTP errors
