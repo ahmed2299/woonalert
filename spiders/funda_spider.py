@@ -88,7 +88,7 @@ class FundaSpider(scrapy.Spider):
                     body=page_content, encoding='utf-8')
                 self.logger.info(f'Fetched page {self.search_result}')
                 self.logger.info(f'Page url {response.url}')
-                self.logger.info(f'Page content {response.body}')
+                self.logger.info(f'Page content {response.text}')
 
                 if response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get():
                     self.logger.info("No more 'Vandaag' listings found, breaking loop")
