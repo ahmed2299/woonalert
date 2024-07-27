@@ -60,7 +60,8 @@ class FundaSpider(scrapy.Spider):
 
     def __init__(self):
         super().__init__()
-        self.search_result = 1
+        self.page_count = 0
+        self.max_pages = 20
         self.existing_data = []
         self.new_data = []
 
@@ -78,10 +79,10 @@ class FundaSpider(scrapy.Spider):
             yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
-        self.logger.info("Parsing FundaSpider response")
+        self.logger.info(f"Parsing page {self.page_count + 1} of FundaSpider response")
         try:
             # Log the full HTML response for debugging
-            with open(f'response_{self.search_result}.html', 'w', encoding='utf-8') as f:
+            with open(f'response_{self.page_count + 1}.html', 'w', encoding='utf-8') as f:
                 f.write(response.text)
 
             items = response.xpath(
@@ -120,10 +121,12 @@ class FundaSpider(scrapy.Spider):
                 else:
                     self.logger.info("Incomplete item, skipping.")
 
-            next_page = response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]/ancestor::a/@href").get()
-            if next_page:
-                self.search_result += 1
-                yield scrapy.Request(url=response.urljoin(next_page), callback=self.parse)
+            self.page_count += 1
+            if self.page_count < self.max_pages:
+                next_page = response.xpath(
+                    "//a[@tabindex='-1']/span[contains(text(),'Volgende')]/ancestor::a/@href").get()
+                if next_page:
+                    yield scrapy.Request(url=response.urljoin(next_page), callback=self.parse)
         except Exception as e:
             self.logger.error(f"Error during parsing: {e}")
 
