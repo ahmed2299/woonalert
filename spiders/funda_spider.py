@@ -2,6 +2,7 @@ import os
 import random
 import sys
 import json
+import time
 from datetime import datetime
 from lxml import html
 import scrapy
@@ -85,7 +86,7 @@ class FundaSpider(scrapy.Spider):
                 f.write(response.text)
 
             items = response.xpath(
-                '//div[@class="pt-4"]//div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]')
+                '//div[@class="pt-4"]//div[contains(text(),"Vandaag")]/../../div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]')
             self.logger.info(f'Found {len(items)} items')
 
             for item in items:
@@ -120,9 +121,12 @@ class FundaSpider(scrapy.Spider):
                 else:
                     self.logger.info("Incomplete item, skipping.")
 
-            if self.search_result<20:
+            if not response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get():
                 self.search_result += 1
+                time.sleep(3)
                 yield scrapy.Request(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}', callback=self.parse)
+            else:
+                self.logger.info("No more 'Vandaag' listings found, breaking loop")
         except Exception as e:
             self.logger.error(f"Error during parsing: {e}")
 
