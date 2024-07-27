@@ -45,9 +45,9 @@ class FundaSpider(scrapy.Spider):
         'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
-        'DOWNLOADER_MIDDLEWARES': {
-            '__main__.ProxyMiddleware': 543,
-        },
+        # 'DOWNLOADER_MIDDLEWARES': {
+        #     '__main__.ProxyMiddleware': 543,
+        # },
         'CONCURRENT_REQUESTS': 16,
         'HTTPCACHE_ENABLED': True,
         'HTTPCACHE_EXPIRATION_SECS': 0,
@@ -60,8 +60,7 @@ class FundaSpider(scrapy.Spider):
 
     def __init__(self):
         super().__init__()
-        self.page_count = 0
-        self.max_pages = 20
+        self.search_result = 1
         self.existing_data = []
         self.new_data = []
 
@@ -79,10 +78,10 @@ class FundaSpider(scrapy.Spider):
             yield scrapy.Request(url, callback=self.parse)
 
     def parse(self, response):
-        self.logger.info(f"Parsing page {self.page_count + 1} of FundaSpider response")
+        self.logger.info("Parsing FundaSpider response")
         try:
             # Log the full HTML response for debugging
-            with open(f'response_{self.page_count + 1}.html', 'w', encoding='utf-8') as f:
+            with open(f'response_{self.search_result}.html', 'w', encoding='utf-8') as f:
                 f.write(response.text)
 
             items = response.xpath(
@@ -121,12 +120,9 @@ class FundaSpider(scrapy.Spider):
                 else:
                     self.logger.info("Incomplete item, skipping.")
 
-            self.page_count += 1
-            if self.page_count < self.max_pages:
-                next_page = response.xpath(
-                    "//a[@tabindex='-1']/span[contains(text(),'Volgende')]/ancestor::a/@href").get()
-                if next_page:
-                    yield scrapy.Request(url=response.urljoin(next_page), callback=self.parse)
+            if self.search_result<20:
+                self.search_result += 1
+                yield scrapy.Request(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}', callback=self.parse)
         except Exception as e:
             self.logger.error(f"Error during parsing: {e}")
 
