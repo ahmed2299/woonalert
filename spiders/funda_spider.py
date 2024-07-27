@@ -37,6 +37,31 @@ class FundaSpider(scrapy.Spider):
         'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result=1',
     ]
 
+    # custom_settings = {
+    #     'ROBOTSTXT_OBEY': False,
+    #     'RETRY_ENABLED': True,
+    #     'RETRY_TIMES': 10,  # Number of retries
+    #     'RETRY_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
+    #     'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    #     'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
+    #     'CONCURRENT_REQUESTS': 16,
+    #     'AUTOTHROTTLE_ENABLED': True,
+    #     'AUTOTHROTTLE_START_DELAY': 5,
+    #     'AUTOTHROTTLE_MAX_DELAY': 60,
+    #     'AUTOTHROTTLE_TARGET_CONCURRENCY': 1.0,
+    #     'AUTOTHROTTLE_DEBUG': False,
+    #     'HTTPCACHE_ENABLED': True,
+    #     'HTTPCACHE_EXPIRATION_SECS': 0,
+    #     'HTTPCACHE_DIR': 'httpcache',
+    #     'HTTPCACHE_STORAGE': 'scrapy.extensions.httpcache.FilesystemCacheStorage',
+    #     'HTTPCACHE_IGNORE_HTTP_CODES': [500, 502, 503, 504, 522, 524, 408, 429],
+    #     'DOWNLOADER_MIDDLEWARES': {
+    #         '__main__.ProxyMiddleware': 543,
+    #     },
+    #     'DOWNLOAD_DELAY': 1,
+    #     'LOG_LEVEL': 'INFO',
+    # }
+
     custom_settings = {
         'ROBOTSTXT_OBEY': False,
         'RETRY_ENABLED': True,
@@ -45,11 +70,6 @@ class FundaSpider(scrapy.Spider):
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'REQUEST_FINGERPRINTER_IMPLEMENTATION': '2.7',
         'CONCURRENT_REQUESTS': 16,
-        'AUTOTHROTTLE_ENABLED': True,
-        'AUTOTHROTTLE_START_DELAY': 5,
-        'AUTOTHROTTLE_MAX_DELAY': 60,
-        'AUTOTHROTTLE_TARGET_CONCURRENCY': 1.0,
-        'AUTOTHROTTLE_DEBUG': False,
         'HTTPCACHE_ENABLED': True,
         'HTTPCACHE_EXPIRATION_SECS': 0,
         'HTTPCACHE_DIR': 'httpcache',
@@ -95,6 +115,8 @@ class FundaSpider(scrapy.Spider):
                     url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}',
                     body=page_content, encoding='utf-8')
                 self.logger.info(f'Fetched page {self.search_result}')
+                self.logger.info(f'Page url {response.url}')
+                self.logger.info(f'Page content {response.body}')
 
                 if response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get():
                     self.logger.info("No more 'Vandaag' listings found, breaking loop")
