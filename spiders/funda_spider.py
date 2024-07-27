@@ -76,6 +76,7 @@ class FundaSpider(scrapy.Spider):
 
     def parse(self, response):
         self.logger.info("Parsing FundaSpider response")
+        self.logger.info(response.text)
         try:
             items = response.xpath(
                 '//div[@class="pt-4"]//div[contains(@class, "border-neutral-20") and contains(@class, "mb-4") and contains(@class, "border-b") and contains(@class, "pb-4")]').getall()
