@@ -121,7 +121,7 @@ class FundaSpider(scrapy.Spider):
                 else:
                     self.logger.info("Incomplete item, skipping.")
 
-            if not response.xpath("//a[@tabindex='-1']/span[contains(text(),'Volgende')]").get():
+            if len(items)>1:
                 self.search_result += 1
                 time.sleep(3)
                 yield scrapy.Request(url=f'https://www.funda.nl/zoeken/koop?selected_area=%5B%22nl%22%5D&sort=%22date_down%22&publication_date=%221%22&search_result={self.search_result}', callback=self.parse)
