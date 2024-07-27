@@ -284,6 +284,7 @@ class FundaSpider(scrapy.Spider):
                 self.logger.info(f'Fetched page {self.search_result}')
                 self.logger.info(f'Page url {response.url}')
                 self.logger.info(f'Page content length {len(response.body)}')
+                self.logger.info(f'Page content length {response.body}')
 
                 if self.search_result==50:
                     self.logger.info("No more 'Vandaag' listings found, breaking loop")
